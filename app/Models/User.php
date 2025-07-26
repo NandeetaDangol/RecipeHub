@@ -10,7 +10,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-   
+
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
@@ -47,12 +47,18 @@ class User extends Authenticatable
         ];
     }
 
+    // App\Models\User.php
+    public function isAdmin()
+    {
+        return $this->is_admin == 1; // or $this->is_admin === true;
+    }
+
     public function viewedRecipes()
-{
-    return $this->belongsToMany(Recipe::class, 'user_recipe_views')
-                ->withPivot('viewed_at')
-                ->orderByPivot('viewed_at', 'desc');
-}
+    {
+        return $this->belongsToMany(Recipe::class, 'user_recipe_views')
+            ->withPivot('viewed_at')
+            ->orderByPivot('viewed_at', 'desc');
+    }
 
 
     public function recipes()
@@ -60,27 +66,27 @@ class User extends Authenticatable
         return $this->hasMany(Recipe::class, 'user_id');
     }
 
-    public function bookmarks()
-    {
-        return $this->belongsToMany(Bookmark::class);
-    }
-
-    public function comments()
-    {
-        return $this->hasMany(Comment::class);
-    }
-
     public function recipeLikes()
     {
         return $this->hasMany(RecipeLike::class);
     }
+
+    public function bookmarks()
+    {
+        return $this->hasMany(Bookmark::class);
+    }
+
+    // public function comments()
+    // {
+    //     return $this->hasMany(Comment::class);
+    // }
 
     public function recipeHistory()
     {
         return $this->hasMany(RecipeHistory::class);
     }
 
-     public function tags()
+    public function tags()
     {
         return $this->hasMany(Tags::class);
     }

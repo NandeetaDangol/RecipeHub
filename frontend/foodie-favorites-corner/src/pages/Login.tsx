@@ -32,13 +32,18 @@ const Login = () => {
       );
 
       const { access_token, user, message } = response.data;
-
-      // ✅ call context login handler
-      login(access_token);
-
+      console.log("Login response:", response.data);
+      login(access_token, user);
       alert(message || "Login successful!");
-      navigate("/");
-      
+
+      if (user.is_admin) {
+        navigate("/admin/dashboard");
+      } else {
+        // navigate("/");
+        navigate("/my-recipes");
+
+      }
+
     } catch (error: any) {
       if (error.response && error.response.data) {
         const data = error.response.data;

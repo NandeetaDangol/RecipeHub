@@ -28,14 +28,13 @@ class Recipe extends Model
     }
 
     public function category()
-{
-    return $this->belongsTo(Category::class);
-}
-
-
-    public function comments()
     {
-        return $this->hasMany(Comment::class);
+        return $this->belongsTo(Category::class);
+    }
+
+    public function recipeLikes()
+    {
+        return $this->hasMany(RecipeLike::class);
     }
 
     public function bookmarks()
@@ -43,14 +42,14 @@ class Recipe extends Model
         return $this->hasMany(Bookmark::class);
     }
 
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
     public function recipeHistories()
     {
         return $this->hasMany(RecipeHistory::class);
-    }
-
-    public function recipeLikes()
-    {
-        return $this->hasMany(RecipeLike::class);
     }
 
     public function recipeTags()

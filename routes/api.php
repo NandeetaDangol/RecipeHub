@@ -16,13 +16,18 @@ use App\Models\Tags;
 use App\Http\Controllers\RecipeTagsController;
 use App\Http\Controllers\RecipeLikeController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Api\Admin\AdminUserController;
+use App\Http\Controllers\Api\Admin\AdminRecipeController;
+use App\Http\Controllers\api\Admin\UsersController;
+use App\Http\Controllers\Api\AdminRecipeController as ApiAdminRecipeController;
 
 // Login route
 Route::get('/test', function () {
     return response()->json([
         'data' => 'test successful',
     ], 200);
-});Route::post('/register', [AuthController::class, 'register']);
+});
+Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 
@@ -47,16 +52,49 @@ Route::get('/recipes/{id}', [RecipeController::class, 'show']);
 Route::get('/recipes/search', [RecipeController::class, 'search']);
 Route::get('/recipedetails/{id}', [RecipeController::class, 'show']);
 
+Route::get('/admin-users', [UsersController::class, 'index']);
+Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
+    Route::get('/users', [AdminUserController::class, 'index']);
+    Route::get('/users/{id}', [AdminUserController::class, 'show']);
+    Route::delete('/users/{id}', [AdminUserController::class, 'destroy']);
+    Route::get('/recipes', [AdminRecipeController::class, 'index']);
+    Route::get('/categories', [CategoryController::class, 'index']);
+    Route::get('/top-rated-recipes', [RecipeController::class, 'topRated']);
+});
+
+Route::get('/top-rated-recipes', [RecipeController::class, 'topRated']);
+
 
 Route::apiResource('categories', CategoryController::class);
 // Custom route to get recipes by category ID
 Route::get('/categories/{id}/recipes', [CategoryController::class, 'recipes']);
 
+Route::get('/recipe-likes', [RecipeLikeController::class, 'index']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/recipe-likes/{recipe}', [RecipeLikeController::class, 'show']);
+    Route::post('/recipe-likes', [RecipeLikeController::class, 'store']);
+    Route::delete('/recipe-likes/{id}', [RecipeLikeController::class, 'destroy']);
+});
+// Public
+
+Route::get('/bookmarks', function () {
+    return response()->json([
+        'message' => 'Bookmark API connection successful',
+        'data' => Bookmark::with(['user', 'recipe'])->take(5)->get(),
+    ], 200);
+});
+// Route::middleware('auth:sanctum')->group(function () {
+//     Route::get('/bookmarks', [BookmarkController::class, 'index']);
+//     Route::post('/bookmarks', [BookmarkController::class, 'store']);
+//     Route::delete('/bookmarks/{id}', [BookmarkController::class, 'destroy']);
+//     Route::get('/bookmarks/check/{recipeId}', [BookmarkController::class, 'check']);
+// });
+
 
 Route::get('/recipe-histories', function () {
     return response()->json([
         'message' => 'RecipeHistory API connection successful',
-        'data' =>RecipeHistory::with(['user', 'recipe'])->take(5)->get(),
+        'data' => RecipeHistory::with(['user', 'recipe'])->take(5)->get(),
     ], 200);
 });
 
@@ -69,12 +107,7 @@ Route::middleware('auth:sanctum')->get('/me/history', [RecipeController::class, 
 // Route::put('/recipe-histories/{id}', [RecipeHistoryController::class, 'update']);
 // Route::delete('/recipe-histories/{id}', [RecipeHistoryController::class, 'destroy']);
 
-Route::get('/bookmarks', function () {
-    return response()->json([
-        'message' => 'Bookmark API connection successful',
-        'data' => Bookmark::with(['user', 'recipe'])->take(5)->get(),
-    ], 200);
-});
+
 
 Route::get('/comments', function () {
     return response()->json([
@@ -123,8 +156,5 @@ Route::get('/recipe-tags', [RecipeTagsController::class, 'index']);
 Route::post('/recipe-tags', [RecipeTagsController::class, 'store']);
 Route::delete('/recipe-tags/{id}', [RecipeTagsController::class, 'destroy']);
 
-Route::get('/recipe-likes', [RecipeLikeController::class, 'index']);
-Route::post('/recipe-likes', [RecipeLikeController::class, 'store']);
-Route::delete('/recipe-likes/{id}', [RecipeLikeController::class, 'destroy']);
 
 Route::middleware('auth:sanctum')->get('/dashboard', [DashboardController::class, 'index']);

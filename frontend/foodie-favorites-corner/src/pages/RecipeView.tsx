@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import RecipeLikeButton from "@/components/RecipeLikeButton";
+
 
 const RecipeView = () => {
   const { id } = useParams();
@@ -11,6 +13,8 @@ const RecipeView = () => {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     axios.get(`${API_BASE_URL}/recipedetails/${id}`)
@@ -45,7 +49,12 @@ const RecipeView = () => {
             <Badge variant="secondary">{recipe.preparation_time} prep</Badge>
             <Badge variant="secondary">{recipe.cooking_time} cook</Badge>
           </div>
+          <div className="mt-4">
+            <RecipeLikeButton recipeId={recipe.id} user={user} />
+
+          </div>
         </CardHeader>
+
         <CardContent>
           <div className="mb-6">
             <h3 className="text-xl font-semibold mb-2">Ingredients</h3>

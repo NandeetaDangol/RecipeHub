@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import axios from "axios";
 
-const categories = ["All", "Italian", "Indian", "Mexican", "Chinese", "Dessert", "Salad"];
+const categories = ["All", "Italian", "Indian", "Mexican", "Chinese", "Dessert"];
 
 const Index = () => {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;

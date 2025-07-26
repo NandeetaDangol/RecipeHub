@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class RecipeLike extends Model
 {
-     protected $fillable = [
+    protected $fillable = [
         'user_id',
         'recipe_id',
         'state',
-        ];
+    ];
 
     public function user()
     {

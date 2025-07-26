@@ -12,6 +12,7 @@ class RecipeController extends Controller
 {
     public function index()
     {
+
         $recipes = Recipe::with('category:id,name')->get();
         return response()->json($recipes);
     }
@@ -145,5 +146,18 @@ class RecipeController extends Controller
         $recipe->delete();
 
         return response()->json(['message' => 'Recipe deleted successfully']);
+    }
+
+    public function topRated()
+    {
+        $recipes = Recipe::withCount('likes')
+            ->orderByDesc('likes_count')
+            ->take(10)
+            ->get();
+
+        return response()->json([
+            'message' => 'Top rated recipes by likes',
+            'data' => $recipes,
+        ]);
     }
 }

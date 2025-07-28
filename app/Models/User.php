@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_admin',
     ];
 
     /**
@@ -69,6 +70,16 @@ class User extends Authenticatable
     public function recipeLikes()
     {
         return $this->hasMany(RecipeLike::class);
+    }
+
+    public function likedRecipes()
+    {
+        return $this->belongsToMany(Recipe::class, 'recipe_likes'); // change table name if different
+    }
+
+    public function dislikedRecipes()
+    {
+        return $this->belongsToMany(Recipe::class, 'recipe_likes')->where('state', 'disliked');
     }
 
     public function bookmarks()

@@ -37,6 +37,27 @@ class Recipe extends Model
         return $this->hasMany(RecipeLike::class);
     }
 
+    public function likedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'recipe_likes');
+    }
+
+    public function isLikedBy($userId)
+    {
+        return $this->recipeLikes()->where('user_id', $userId)->where('state', 'liked')->exists();
+    }
+
+    public function getUserLikeState($userId)
+    {
+        $like = $this->recipeLikes()->where('user_id', $userId)->first();
+        return $like ? $like->state : null;
+    }
+
+    public function getLikesCountAttribute()
+    {
+        return $this->recipeLikes()->where('state', 'liked')->count();
+    }
+
     public function bookmarks()
     {
         return $this->hasMany(Bookmark::class);
@@ -56,6 +77,8 @@ class Recipe extends Model
     {
         return $this->hasMany(RecipeTags::class);
     }
+
+
 
     public function tags()
     {

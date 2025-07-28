@@ -1,5 +1,6 @@
 // src/components/AdminDashboard.tsx
 import { useEffect, useState } from "react";
+
 import {
   Users,
   ChefHat,
@@ -159,7 +160,7 @@ const AdminDashboard = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard': return renderDashboard();
-      case 'users': return <UsersPage/>;
+      case 'users': return <UsersPage />;
       case 'recipes': return <div>Recipe management will go here...</div>;
       case 'analytics': return renderDashboard();
       case 'likes': return <div className="bg-white rounded-lg shadow-md p-6"><h2 className="text-xl font-semibold">Manage Recipe Likes</h2><p className="text-gray-600 mt-2">Feature coming soon...</p></div>;

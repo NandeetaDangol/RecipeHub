@@ -121,6 +121,7 @@ const CreateRecipe = () => {
   };
 
   return (
+
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="mb-8">
@@ -291,11 +292,11 @@ const CreateRecipe = () => {
                       required
                     >
                       <option value="">Select category</option>
-                        {categories.map(category => (
-                          <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-              ))}
+                      {categories.map(category => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
                     </select>
                   </div>
 

@@ -148,6 +148,14 @@ class RecipeController extends Controller
         return response()->json(['message' => 'Recipe deleted successfully']);
     }
 
+    public function recommended()
+    {
+        $user = auth()->user(); // or static for now
+        $recipes = Recipe::inRandomOrder()->take(5)->get();
+        return response()->json($recipes);
+    }
+
+
     public function topRated()
     {
         $recipes = Recipe::withCount('likes')

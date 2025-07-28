@@ -22,9 +22,11 @@ import EditRecipe from "./pages/EditRecipe";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 import Profile from "./pages/Profile";
+import UserProfile from "@/pages/UserProfile";
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminRoute from "./components/AdminRoute";
+import Dashboard from "./pages/Dashboard";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +50,9 @@ const App = () => (
               <Route path="/profile" element={<Profile />} />
               {/* <Route path="/admin/dashboard" element={<AdminDashboard />} /> */}
               <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/profile" element={<UserProfile />} />
+
               {/* <Route path="/admin/dashboard" element={<DashboardPage />} /> */}
               {/* <Route path="/admin/users" element={<UsersPage />} />
               <Route path="/admin/categories" element={<CategoriesPage />} />

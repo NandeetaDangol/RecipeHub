@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\Admin\AdminUserController;
 use App\Http\Controllers\Api\Admin\AdminRecipeController;
 use App\Http\Controllers\api\Admin\UsersController;
 use App\Http\Controllers\Api\AdminRecipeController as ApiAdminRecipeController;
+use App\Http\Controllers\RecommendationController;
 
 // Login route
 Route::get('/test', function () {
@@ -158,3 +159,10 @@ Route::delete('/recipe-tags/{id}', [RecipeTagsController::class, 'destroy']);
 
 
 Route::middleware('auth:sanctum')->get('/dashboard', [DashboardController::class, 'index']);
+Route::middleware('auth:sanctum')->get('/recommended-recipes', [RecommendationController::class, 'index']);
+// Route::get('/recommended-recipes', [RecommendationController::class, 'get']);
+
+
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});

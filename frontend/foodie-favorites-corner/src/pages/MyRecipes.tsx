@@ -92,17 +92,36 @@ const MyRecipes = () => {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
+          {/* Left side: title + subtitle */}
           <div>
             <h1 className="text-3xl font-bold">My Recipes</h1>
             <p className="text-muted-foreground mt-2">Manage your recipe collection</p>
           </div>
-          <Button asChild size="lg">
-            <Link to="/create-recipe">
-              <Plus className="h-5 w-5 mr-2" />
-              Create New Recipe
-            </Link>
-          </Button>
+
+          {/* Right side: buttons in a row */}
+          <div className="flex space-x-3">
+            <Button asChild size="lg" variant="outline">
+              <Link to="/">
+                Back
+              </Link>
+            </Button>
+
+            <Button asChild size="lg" variant="outline">
+              <Link to="/profile">
+                <Plus className="h-5 w-5 mr-1" />
+                View Profile
+              </Link>
+            </Button>
+
+            <Button asChild size="lg">
+              <Link to="/create-recipe">
+                <Plus className="h-5 w-5 mr-2" />
+                Create New Recipe
+              </Link>
+            </Button>
+          </div>
         </div>
+
 
         {/* Search and Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -158,7 +177,7 @@ const MyRecipes = () => {
               <Card key={recipe.id} className="overflow-hidden">
                 <div className="aspect-video overflow-hidden">
                   <img
-                    src={recipe.image_url}
+                    src={'http://localhost:8000/api/image/' + recipe.images}
                     alt={recipe.name}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   />
@@ -216,6 +235,7 @@ const MyRecipes = () => {
                   )}
 
                   <div className="flex space-x-2">
+
                     <Button asChild variant="outline" size="sm" className="flex-1">
                       <Link to={`/viewrecipe/${recipe.id}`}>View Recipe</Link>
                     </Button>

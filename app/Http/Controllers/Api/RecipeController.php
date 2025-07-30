@@ -5,14 +5,23 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use App\Services\RecipeSimilarityService;
+
 use App\Models\Recipe;
 use App\Models\UserRecipeView;
 
 class RecipeController extends Controller
 {
+    protected $similarityService;
+
+    public function __construct(RecipeSimilarityService $similarityService)
+    {
+        $this->similarityService = $similarityService;
+    }
+
     public function index()
     {
-
         $recipes = Recipe::with('category:id,name')->get();
         return response()->json($recipes);
     }
@@ -28,11 +37,19 @@ class RecipeController extends Controller
             'servings' => 'nullable|integer',
             'ingredients' => 'nullable|array',
             'instructions' => 'nullable|array',
-            'image_url' => 'nullable|url',
+            // 'images' => 'nullable|mimes:jpg,jpeg,png|max:2048',
             'submission_date' => 'nullable|date',
             'is_approved' => 'boolean',
             'view_count' => 'integer|min:0',
         ]);
+
+        $filePath = null;
+        if ($request->hasFile('images')) {
+            $file = $request->file('images');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('uploads', $fileName, 'public');
+            Log::info($filePath);
+        }
 
         $recipe = $request->user()->recipes()->create([
             'name' => $validated['name'],
@@ -41,9 +58,9 @@ class RecipeController extends Controller
             'preparation_time' => $validated['preparation_time'],
             'cooking_time' => $validated['cooking_time'],
             'servings' => $validated['servings'] ?? null,
-            'ingredients' => json_encode($validated['ingredients']),
-            'instructions' => json_encode($validated['instructions']),
-            'image_url' => $validated['image_url'] ?? null,
+            'ingredients' => json_encode($validated['ingredients'] ?? []),
+            'instructions' => json_encode($validated['instructions'] ?? []),
+            'images' => $filePath,
             'submission_date' => $validated['submission_date'] ?? now(),
             'is_approved' => $validated['is_approved'] ?? false,
             'view_count' => 0,
@@ -53,6 +70,8 @@ class RecipeController extends Controller
             $recipe->tags()->sync($request->tags);
         }
 
+        Log::info($recipe);
+
         return response()->json($recipe, 201);
     }
 
@@ -61,7 +80,6 @@ class RecipeController extends Controller
         $recipe = Recipe::with('category')->findOrFail($id);
         $recipe->increment('view_count');
 
-        // Record user-specific recipe view
         if ($request->user()) {
             UserRecipeView::updateOrCreate(
                 [
@@ -77,8 +95,20 @@ class RecipeController extends Controller
         $recipe->ingredients = json_decode($recipe->ingredients, true);
         $recipe->instructions = json_decode($recipe->instructions, true);
 
-        return response()->json($recipe);
+        return response()->json([
+            'recipe' => $recipe
+        ]);
     }
+    public function getSimilarRecipes($id)
+    {
+        $similarRecipes = $this->similarityService->getSimilarRecipes($id);
+
+        return response()->json([
+            'similar_recipes' => $similarRecipes
+        ]);
+    }
+
+
 
     public function history(Request $request)
     {
@@ -107,7 +137,7 @@ class RecipeController extends Controller
                 'preparation_time' => 'required|integer|min:0',
                 'cooking_time' => 'required|integer|min:0',
                 'servings' => 'nullable|integer',
-                'image_url' => 'nullable|url',
+                'images' => 'required|image|mimes:jpg,jpeg,png|max:2048',
                 'view_count' => 'nullable|integer',
                 'submission_date' => 'nullable|date',
                 'ingredients' => 'nullable|array',
@@ -118,6 +148,13 @@ class RecipeController extends Controller
             return response()->json(['errors' => $e->errors()], 422);
         }
 
+        $filePath = $recipe->images;
+        if ($request->hasFile('images')) {
+            $file = $request->file('images');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('uploads', $fileName, 'public');
+        }
+
         $recipe->update([
             'name' => $validated['name'],
             'description' => $validated['description'],
@@ -125,7 +162,7 @@ class RecipeController extends Controller
             'preparation_time' => $validated['preparation_time'],
             'cooking_time' => $validated['cooking_time'],
             'servings' => $validated['servings'] ?? null,
-            'image_url' => $validated['image_url'] ?? $recipe->image_url,
+            'images' => $filePath,
             'view_count' => $validated['view_count'] ?? $recipe->view_count,
             'submission_date' => $validated['submission_date'] ?? $recipe->submission_date,
             'is_approved' => $validated['is_approved'] ?? $recipe->is_approved,
@@ -154,7 +191,6 @@ class RecipeController extends Controller
         $recipes = Recipe::inRandomOrder()->take(5)->get();
         return response()->json($recipes);
     }
-
 
     public function topRated()
     {

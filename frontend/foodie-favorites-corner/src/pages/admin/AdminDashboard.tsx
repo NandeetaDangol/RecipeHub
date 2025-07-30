@@ -1,6 +1,5 @@
 // src/components/AdminDashboard.tsx
 import { useEffect, useState } from "react";
-
 import {
   Users,
   ChefHat,
@@ -25,7 +24,6 @@ import {
 
 import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import UsersPage from "./UsersPage";
 
 const AdminDashboard = () => {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -160,7 +158,7 @@ const AdminDashboard = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard': return renderDashboard();
-      case 'users': return <UsersPage />;
+      case 'users': return <div>Users management will go here... </div>;
       case 'recipes': return <div>Recipe management will go here...</div>;
       case 'analytics': return renderDashboard();
       case 'likes': return <div className="bg-white rounded-lg shadow-md p-6"><h2 className="text-xl font-semibold">Manage Recipe Likes</h2><p className="text-gray-600 mt-2">Feature coming soon...</p></div>;

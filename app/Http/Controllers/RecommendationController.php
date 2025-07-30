@@ -7,14 +7,28 @@ use App\Services\KNNRecommendationService;
 
 class RecommendationController extends Controller
 {
+    protected $knnService;
+
+    public function __construct(KNNRecommendationService $knnService)
+    {
+        $this->knnService = $knnService;
+    }
+
     public function index(Request $request)
     {
-        $userId = auth()->id(); // Authenticated user ID
+        $userId = auth()->id();
 
-        // Call your recommendation logic
-        $recommended = (new KNNRecommendationService())->getRecommendations($userId);
+        if (!$userId) {
+            return response()->json([
+                'message' => 'Unauthorized',
+            ], 401);
+        }
 
-        // Return the recommended recipes as JSON
-        return response()->json($recommended);
+        $recommended = $this->knnService->getRecommendations($userId);
+
+        return response()->json([
+            'message' => 'Recommendations fetched successfully',
+            'data' => $recommended,
+        ]);
     }
 }

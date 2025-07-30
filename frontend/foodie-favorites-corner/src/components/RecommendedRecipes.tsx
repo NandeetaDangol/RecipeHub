@@ -1,11 +1,12 @@
 // src/components/RecommendedRecipes.jsx
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart, Clock, Users, ChefHat } from "lucide-react";
 
 const RecommendedRecipes = ({ user }) => {
-    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
     const [recommendedRecipes, setRecommendedRecipes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -22,10 +23,13 @@ const RecommendedRecipes = ({ user }) => {
     const getRecommendations = async () => {
         try {
             setLoading(true);
-            const res = await axios.get(`${API_BASE_URL}/api/recommended-recipes`, getAuthHeaders());
+            const res = await axios.get(
+                `${API_BASE_URL}/api/recommended-recipes`,
+                getAuthHeaders()
+            );
 
-            if (res.data.data) {
-                setRecommendedRecipes(res.data.data);
+            if (res.data) {
+                setRecommendedRecipes(res.data);
             } else {
                 setRecommendedRecipes([]);
             }
@@ -45,7 +49,7 @@ const RecommendedRecipes = ({ user }) => {
         }
 
         try {
-            const currentRecipe = recommendedRecipes.find(r => r.id === recipeId);
+            const currentRecipe = recommendedRecipes.find((r) => r.id === recipeId);
             const currentState = currentRecipe?.user_state;
             const newState = currentState === "liked" ? "disliked" : "liked";
 
@@ -58,24 +62,24 @@ const RecommendedRecipes = ({ user }) => {
                 getAuthHeaders()
             );
 
-            setRecommendedRecipes(prev =>
-                prev.map(recipe => {
+            setRecommendedRecipes((prev) =>
+                prev.map((recipe) => {
                     if (recipe.id === recipeId) {
-                        const updatedLikesCount = newState === "liked"
-                            ? recipe.likes_count + (currentState === "liked" ? 0 : 1)
-                            : recipe.likes_count - (currentState === "liked" ? 1 : 0);
+                        const updatedLikesCount =
+                            newState === "liked"
+                                ? recipe.likes_count + (currentState === "liked" ? 0 : 1)
+                                : recipe.likes_count - (currentState === "liked" ? 1 : 0);
 
                         return {
                             ...recipe,
                             user_state: response.data.data.state,
                             is_liked: response.data.data.state === "liked",
-                            likes_count: Math.max(0, updatedLikesCount)
+                            likes_count: Math.max(0, updatedLikesCount),
                         };
                     }
                     return recipe;
                 })
             );
-
         } catch (err) {
             console.error("Like error", err);
             alert("Failed to update like status. Please try again.");
@@ -146,32 +150,44 @@ const RecommendedRecipes = ({ user }) => {
             ) : (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {recommendedRecipes.map((recipe) => (
-                        <Card key={recipe.id} className="shadow-lg rounded-xl overflow-hidden hover:shadow-xl transition-shadow">
-                            {recipe.image && (
+                        <Card
+                            key={recipe.id}
+                            className="shadow-lg rounded-xl overflow-hidden hover:shadow-xl transition-shadow"
+                        >
+                            {recipe.images && (
                                 <div className="relative h-48 bg-gray-200">
                                     <img
-                                        src={recipe.image}
-                                        alt={recipe.title}
+                                        src={`${API_BASE_URL}/storage/${recipe.images}`}
+                                        alt={recipe.name}
                                         className="w-full h-full object-cover"
                                         onError={(e) => {
-                                            e.target.style.display = 'none';
+                                            e.target.style.display = "none";
                                         }}
                                     />
                                 </div>
                             )}
 
                             <CardHeader className="pb-3">
-                                <CardTitle className="text-lg line-clamp-2">{recipe.title}</CardTitle>
+                                <CardTitle className="text-lg line-clamp-2">{recipe.name}</CardTitle>
                             </CardHeader>
 
                             <CardContent className="space-y-3">
-                                <p className="text-gray-600 text-sm line-clamp-3">{recipe.description}</p>
+                                <p className="text-gray-600 text-sm line-clamp-3">
+                                    {recipe.description}
+                                </p>
 
                                 <div className="flex flex-wrap gap-3 text-sm text-gray-500">
-                                    {recipe.prep_time && (
+                                    {recipe.preparation_time && (
                                         <div className="flex items-center gap-1">
                                             <Clock className="h-4 w-4" />
-                                            <span>{recipe.prep_time} min</span>
+                                            <span>{recipe.preparation_time} min prep</span>
+                                        </div>
+                                    )}
+
+                                    {recipe.cooking_time && (
+                                        <div className="flex items-center gap-1">
+                                            <Clock className="h-4 w-4" />
+                                            <span>{recipe.cooking_time} min cook</span>
                                         </div>
                                     )}
 
@@ -194,25 +210,22 @@ const RecommendedRecipes = ({ user }) => {
                                     <button
                                         onClick={() => toggleLike(recipe.id)}
                                         className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm transition-colors ${recipe.is_liked
-                                            ? 'bg-red-100 text-red-700'
-                                            : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600'
+                                            ? "bg-red-100 text-red-700"
+                                            : "bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600"
                                             }`}
                                     >
                                         <Heart
-                                            className={`h-4 w-4 ${recipe.is_liked ? 'fill-current' : ''
-                                                }`}
+                                            className={`h-4 w-4 ${recipe.is_liked ? "fill-current" : ""}`}
                                         />
                                         <span>{recipe.likes_count || 0}</span>
                                     </button>
 
-                                    <button
+                                    <Link
+                                        to={`/recipes/${recipe.id}`}
                                         className="px-4 py-1 bg-blue-600 text-white rounded-full text-sm hover:bg-blue-700 transition-colors"
-                                        onClick={() => {
-                                            window.location.href = `/recipes/${recipe.id}`;
-                                        }}
                                     >
                                         View Recipe
-                                    </button>
+                                    </Link>
                                 </div>
 
                                 {recipe.user_state && (

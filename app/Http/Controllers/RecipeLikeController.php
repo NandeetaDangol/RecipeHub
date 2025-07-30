@@ -58,7 +58,6 @@ class RecipeLikeController extends Controller
     {
         $like = RecipeLike::findOrFail($id);
         $like->delete();
-
         return response()->json([
             'message' => 'Recipe like/dislike deleted successfully',
         ]);

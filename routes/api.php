@@ -18,9 +18,11 @@ use App\Http\Controllers\RecipeLikeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Api\Admin\AdminUserController;
 use App\Http\Controllers\Api\Admin\AdminRecipeController;
-use App\Http\Controllers\api\Admin\UsersController;
+use App\Http\Controllers\api\Admin\UserController;
 use App\Http\Controllers\Api\AdminRecipeController as ApiAdminRecipeController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RecommendationController;
+
 
 // Login route
 Route::get('/test', function () {
@@ -30,6 +32,8 @@ Route::get('/test', function () {
 });
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout']);
+
 
 
 // Protected route - get authenticated user details
@@ -42,6 +46,20 @@ Route::get('/recipes', function () {
         'message' => 'Recipe test successful',
     ], 200);
 });
+// Route::middleware('auth:sanctum')->group(function () {
+//     // ...existing routes...
+//     Route::get('/profile', [ProfileController::class, 'show']);
+//     Route::put('/profile', [ProfileController::class, 'update']);
+// });
+
+// return image
+Route::get('image/{filename}', function ($filename) {
+    $imagePath = storage_path('app/public/uploads/' . $filename);
+    if (file_exists($imagePath)) {
+        return response()->file($imagePath);
+    }
+    return response()->json(['error' => 'Image not found'], 404);
+});
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/recipes', [RecipeController::class, 'store']);
@@ -52,10 +70,11 @@ Route::get('/recipes', [RecipeController::class, 'index']);
 Route::get('/recipes/{id}', [RecipeController::class, 'show']);
 Route::get('/recipes/search', [RecipeController::class, 'search']);
 Route::get('/recipedetails/{id}', [RecipeController::class, 'show']);
+Route::get('/recipedetails/{id}/similar', [RecipeController::class, 'getSimilarRecipes']);
 
-Route::get('/admin-users', [UsersController::class, 'index']);
+
 Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
-    Route::get('/users', [AdminUserController::class, 'index']);
+    Route::get('/admin/users', [AdminUserController::class, 'index']);
     Route::get('/users/{id}', [AdminUserController::class, 'show']);
     Route::delete('/users/{id}', [AdminUserController::class, 'destroy']);
     Route::get('/recipes', [AdminRecipeController::class, 'index']);

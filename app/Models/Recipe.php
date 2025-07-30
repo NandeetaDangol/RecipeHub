@@ -16,7 +16,7 @@ class Recipe extends Model
         'servings',
         'ingredients',
         'instructions',
-        'image_url',
+        'images',
         'is_approved',
         'view_count',
     ];

@@ -30,7 +30,7 @@ const Index = () => {
   useEffect(() => {
     axios.get(`${API_BASE_URL}/recipes`)
       .then(response => {
-        setRecipes(response.data); // response should include category as object
+        setRecipes(response.data);
       })
       .catch(error => {
         console.error("Error fetching recipes:", error);
@@ -60,19 +60,15 @@ const Index = () => {
             Find and create delicious recipes from around the world. Join our community of food lovers!
           </p>
           <div className="max-w-md mx-auto">
-            <div className="flex">
-              <Input
-                type="text"
-                placeholder="Search for recipes..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="rounded-r-none text-black"
-              />
-              <Button className="rounded-l-none bg-white text-orange-500 hover:bg-gray-100">
-                Search
-              </Button>
-            </div>
+            <Input
+              type="text"
+              placeholder="Search for recipes..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="text-black"
+            />
           </div>
+
         </div>
       </div>
 
@@ -105,7 +101,7 @@ const Index = () => {
               <Card key={recipe.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                 <div className="aspect-video overflow-hidden">
                   <img
-                    src={recipe.image_url}
+                    src={'http://localhost:8000/api/image/' + recipe.images}
                     alt={recipe.name}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   />

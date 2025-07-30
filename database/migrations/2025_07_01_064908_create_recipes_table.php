@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('servings')->nullable();
             $table->json('ingredients')->nullable();
             $table->json('instructions')->nullable();
-            $table->string('image_url')->nullable();
+            $table->string('images')->nullable();
             $table->string('submission_date')->nullable();
             $table->boolean('is_approved')->default(true);
             $table->unsignedInteger('view_count')->default(0);

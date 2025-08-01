@@ -37,7 +37,7 @@ class RecipeController extends Controller
             'servings' => 'nullable|integer',
             'ingredients' => 'nullable|array',
             'instructions' => 'nullable|array',
-            // 'images' => 'nullable|mimes:jpg,jpeg,png|max:2048',
+            'images' => 'nullable|mimes:jpg,jpeg,png|max:2048',
             'submission_date' => 'nullable|date',
             'is_approved' => 'boolean',
             'view_count' => 'integer|min:0',

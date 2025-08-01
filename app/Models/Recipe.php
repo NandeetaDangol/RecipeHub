@@ -21,6 +21,12 @@ class Recipe extends Model
         'view_count',
     ];
 
+    // protected $casts = [
+    //     'ingredients' => 'array',
+    //     'instructions' => 'array',
+    //     'is_approved' => 'boolean',
+    // ];
+
 
     public function user()
     {

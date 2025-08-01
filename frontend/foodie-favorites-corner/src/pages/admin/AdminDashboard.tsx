@@ -1,29 +1,15 @@
 // src/components/AdminDashboard.tsx
 import { useEffect, useState } from "react";
+import UsersPage from '@/pages/admin/UsersPage';
+import RecipePage from '@/pages/admin/RecipePage';
+import CategoryPage from '@/pages/admin/CategoryPage';
+
 import {
-  Users,
-  ChefHat,
-  BarChart3,
-  Heart,
-  FolderOpen,
-  Settings,
-  Eye,
-  Ban,
-  CheckCircle,
-  XCircle,
-  Edit,
-  Trash2,
-  Plus,
-  Search,
-  Filter,
-  TrendingUp,
-  Star,
-  Bookmark,
-  UserCheck
+  Users, ChefHat, BarChart3, Heart, FolderOpen, Settings,
+  Eye, TrendingUp, Star, UserCheck
 } from "lucide-react";
 
 import axios from "axios";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const AdminDashboard = () => {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -38,31 +24,91 @@ const AdminDashboard = () => {
     totalRecipes: 0,
     pendingRecipes: 0,
     totalViews: 0,
-    topRecipes: [],
-    activeUsers: 0
+    totalCategories: 0
   });
+
+  const renderRecipes = () => (
+    <div className="bg-white rounded-lg shadow-md p-6">
+      <h2 className="text-xl font-semibold mb-4">Manage Recipes</h2>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">ID</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Image</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Name</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Views</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Status</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {recipes.map(recipe => (
+              <tr key={recipe.id}>
+                <td className="px-4 py-2 text-sm text-gray-700">{recipe.id}</td>
+                <td className="px-4 py-2">
+                  <img
+                    src={`${API_BASE_URL}/storage/${recipe.images}`}
+                    alt={recipe.name}
+                    className="h-12 w-12 rounded object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = '/default-recipe.jpg';
+                    }}
+                  />
+                </td>
+                <td className="px-4 py-2 text-sm font-medium text-gray-900">{recipe.name}</td>
+                <td className="px-4 py-2 text-sm text-gray-700">{recipe.views}</td>
+                <td className="px-4 py-2 text-sm">
+                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${recipe.status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                    {recipe.status}
+                  </span>
+                </td>
+                <td className="px-4 py-2 text-sm">
+                  <button className="text-blue-600 hover:underline">View</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [usersRes, recipesRes, categoriesRes, topRatedRes] = await Promise.all([
-          axios.get(`${API_BASE_URL}/admin/users`),
-          axios.get(`${API_BASE_URL}/admin/recipes`),
-          axios.get(`${API_BASE_URL}/admin/categories`),
-          axios.get(`${API_BASE_URL}/admin/top-rated-recipes`)
-        ]);
+        const usersApiUrl = `${API_BASE_URL}/admin/users`;
+        const recipesApiUrl = `${API_BASE_URL}/admin/recipes`;
+        const categoriesApiUrl = `${API_BASE_URL}/admin/categories`;
 
-        setUsers(usersRes.data);
-        setRecipes(recipesRes.data);
-        setCategories(categoriesRes.data);
+        console.log("Users API URL:", usersApiUrl);
+
+        // Fetch only users to confirm users are loading
+        const [usersRes, recipesRes, categoriesRes] = await Promise.all([
+          axios.get(usersApiUrl),
+          axios.get(recipesApiUrl),
+          axios.get(categoriesApiUrl)
+
+        ]);
+        const usersData = usersRes.data.data ?? usersRes.data ?? [];
+        const recipesData = recipesRes.data.data ?? recipesRes.data ?? [];
+        const categoriesData = categoriesRes.data.data ?? categoriesRes.data ?? [];
+
+        setUsers(usersData);
+        setRecipes(recipesData);
+        setCategories(categoriesData);
+
+
+        // For now, set empty arrays for others
+        // setRecipes([]);
+        // setCategories([]);
 
         setAnalytics({
-          totalUsers: usersRes.data.length,
-          totalRecipes: recipesRes.data.length,
-          pendingRecipes: recipesRes.data.filter(r => r.status === 'pending').length,
-          totalViews: recipesRes.data.reduce((sum, r) => sum + (r.views || 0), 0),
-          topRecipes: topRatedRes.data,
-          activeUsers: usersRes.data.filter(u => u.status === 'active').length
+          totalUsers: usersData.length,
+          totalRecipes: recipesData.length,
+          pendingRecipes: recipesData.filter(r => !r.is_approved).length,
+          totalViews: recipesData.reduce((acc, r) => acc + (r.view_count || 0), 0),
+          totalCategories: categoriesData.length
         });
       } catch (error) {
         console.error("Failed to load stats:", error);
@@ -96,7 +142,7 @@ const AdminDashboard = () => {
     >
       <Icon className="h-5 w-5" />
       <span>{label}</span>
-      {count && <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">{count}</span>}
+      {count ? <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">{count}</span> : null}
     </button>
   );
 
@@ -116,18 +162,7 @@ const AdminDashboard = () => {
             Top Performing Recipes
           </h3>
           <div className="space-y-3">
-            {analytics.topRecipes?.map((recipe, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
-                <div>
-                  <p className="font-medium">{recipe.title}</p>
-                  <p className="text-sm text-gray-600">{recipe.views} views</p>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                  <span className="text-sm font-medium">{recipe.rating}</span>
-                </div>
-              </div>
-            ))}
+            {/* Placeholder for top recipes */}
           </div>
         </div>
 
@@ -139,7 +174,7 @@ const AdminDashboard = () => {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-gray-600">Active Users</span>
-              <span className="font-semibold text-green-600">{analytics.activeUsers}</span>
+              {/* Placeholder for active users */}
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600">New This Month</span>
@@ -158,18 +193,23 @@ const AdminDashboard = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard': return renderDashboard();
-      case 'users': return <div>Users management will go here... </div>;
-      case 'recipes': return <div>Recipe management will go here...</div>;
+      case 'users': return <UsersPage users={users} />;
+      case 'recipes': return renderRecipes();
       case 'analytics': return renderDashboard();
-      case 'likes': return <div className="bg-white rounded-lg shadow-md p-6"><h2 className="text-xl font-semibold">Manage Recipe Likes</h2><p className="text-gray-600 mt-2">Feature coming soon...</p></div>;
-      case 'categories': return <div>Categories management will go here...</div>;
+      case 'likes': return (
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-semibold">Manage Recipe Likes.</h2>
+          <p className="text-gray-600 mt-2">Feature coming soon...</p>
+        </div>
+      );
+      case 'categories': return <CategoryPage />;
+      // case 'categories': return <CategoryPage categories={categories} />;
       default: return renderDashboard();
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -188,17 +228,15 @@ const AdminDashboard = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Navigation Tabs */}
         <div className="flex flex-wrap gap-2 mb-8 bg-white p-4 rounded-lg shadow-sm">
           <TabButton id="dashboard" label="Dashboard" icon={BarChart3} />
           <TabButton id="users" label="Users" icon={Users} />
           <TabButton id="recipes" label="Recipes" icon={ChefHat} count={analytics.pendingRecipes} />
+          <TabButton id="categories" label="Categories" icon={FolderOpen} />
           <TabButton id="analytics" label="Analytics" icon={BarChart3} />
           <TabButton id="likes" label="Recipe Likes" icon={Heart} />
-          <TabButton id="categories" label="Categories" icon={FolderOpen} />
         </div>
 
-        {/* Main Content */}
         <main>
           {loading ? <p>Loading dashboard data...</p> : renderContent()}
         </main>

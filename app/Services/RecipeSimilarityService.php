@@ -53,8 +53,10 @@ class RecipeSimilarityService
 
     private function extractCombinedFeatures(Recipe $recipe): array
     {
-        $ingredients = json_decode($recipe->ingredients ?? '[]', true);
-        $ingredients = array_map(fn($i) => Str::lower(trim($i)), $ingredients);
+        $decoded = json_decode($recipe->ingredients ?? '[]', true);
+        $ingredients = is_array($decoded)
+            ? array_map(fn($i) => Str::lower(trim($i)), $decoded)
+            : [];
 
         $nameWords = explode(' ', Str::lower($recipe->name ?? ''));
         $nameWords = array_map('trim', $nameWords);

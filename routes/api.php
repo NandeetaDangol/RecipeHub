@@ -17,7 +17,8 @@ use App\Http\Controllers\RecipeTagsController;
 use App\Http\Controllers\RecipeLikeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Api\Admin\AdminUserController;
-use App\Http\Controllers\Api\Admin\AdminRecipeController;
+use App\Http\Controllers\Api\Admin\RecipesController;
+use App\Http\Controllers\Api\Admin\CategoriesController;
 use App\Http\Controllers\api\Admin\UserController;
 use App\Http\Controllers\Api\AdminRecipeController as ApiAdminRecipeController;
 use App\Http\Controllers\ProfileController;
@@ -74,15 +75,25 @@ Route::get('/recipedetails/{id}/similar', [RecipeController::class, 'getSimilarR
 
 
 Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
-    Route::get('/admin/users', [AdminUserController::class, 'index']);
+    Route::get('/users', [AdminUserController::class, 'index']);
     Route::get('/users/{id}', [AdminUserController::class, 'show']);
     Route::delete('/users/{id}', [AdminUserController::class, 'destroy']);
-    Route::get('/recipes', [AdminRecipeController::class, 'index']);
-    Route::get('/categories', [CategoryController::class, 'index']);
-    Route::get('/top-rated-recipes', [RecipeController::class, 'topRated']);
+});
+
+Route::prefix('admin')->group(function () {
+    Route::get('/recipes', [RecipesController::class, 'index']);
+});
+
+Route::prefix('admin')->group(function () {
+    Route::get('/categories', [CategoriesController::class, 'index']);
+    Route::post('/categories', [CategoriesController::class, 'store']);
+    Route::put('/categories/{id}', [CategoriesController::class, 'update']);
+    Route::delete('/categories/{id}', [CategoriesController::class, 'destroy']);
 });
 
 Route::get('/top-rated-recipes', [RecipeController::class, 'topRated']);
+Route::get('/top-rated-recipes', [RecipeController::class, 'topRated']);
+
 
 
 Route::apiResource('categories', CategoryController::class);

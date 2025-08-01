@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Toaster } from "@/components/ui/toaster";
 import axios from "axios";
 
-const categories = ["All", "Italian", "Indian", "Mexican", "Chinese", "Dessert"];
+// const categories = ["All", "Italian", "Indian", "Mexican", "Chinese", "Dessert"];
 
 const Index = () => {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -14,6 +15,8 @@ const Index = () => {
   const [recipes, setRecipes] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [categories, setCategories] = useState<string[]>([]);
+
 
   // Fetch test message
   useEffect(() => {
@@ -25,6 +28,25 @@ const Index = () => {
         console.error("Error fetching test data:", error);
       });
   }, []);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/api/categories");
+        const data = response.data; // Change to response.data.data if needed
+
+        console.log("Fetched categories:", data); // Debug here
+
+        const categoryNames = ["All", ...data.map((cat: any) => cat.name)];
+        setCategories(categoryNames);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
 
   // Fetch recipes from API
   useEffect(() => {
@@ -38,7 +60,7 @@ const Index = () => {
   }, []);
 
   const filteredRecipes = recipes
-    .filter(recipe => recipe.is_approved === 1)
+    .filter(recipe => recipe.is_approved == 1)
     .filter(recipe => {
       const matchesSearch = recipe.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         recipe.description?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -75,21 +97,27 @@ const Index = () => {
       {/* Main Section */}
       <div className="container mx-auto px-4 py-12">
         {/* Categories */}
+        {/* Categories */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold mb-4">Browse by Category</h2>
           <div className="flex flex-wrap gap-2">
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCategory(category)}
-              >
-                {category}
-              </Button>
-            ))}
+            {categories.length === 0 ? (
+              <p>Loading categories...</p>
+            ) : (
+              categories.map((category) => (
+                <Button
+                  key={category}
+                  variant={selectedCategory === category ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedCategory(category)}
+                >
+                  {category}
+                </Button>
+              ))
+            )}
           </div>
         </div>
+
 
         {/* Featured Recipes */}
         <div className="mb-12">

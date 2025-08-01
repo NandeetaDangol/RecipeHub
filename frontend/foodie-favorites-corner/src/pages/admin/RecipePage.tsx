@@ -1,15 +1,28 @@
+// src/pages/admin/RecipePage.tsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Eye } from 'lucide-react';
+import { Eye, Pencil, Trash2 } from 'lucide-react';
+
+interface Recipe {
+    id: number;
+    name: string;
+    user?: { name: string };
+    category?: { name: string };
+    preparation_time?: string;
+    cooking_time?: string;
+    servings?: number;
+    view_count: number;
+    images?: string | null;
+}
 
 const RecipePage = () => {
-    const [recipes, setRecipes] = useState([]);
+    const [recipes, setRecipes] = useState<Recipe[]>([]);
 
     useEffect(() => {
         const fetchRecipes = async () => {
             try {
-                const res = await axios.get('/api/recipes');
-                setRecipes(res.data); // Make sure this matches your API response structure
+                const res = await axios.get('/admin/recipes'); // Adjust URL if needed
+                setRecipes(res.data); // Make sure API returns array of recipes directly
             } catch (error) {
                 console.error('Failed to fetch recipes:', error);
             }
@@ -25,6 +38,7 @@ const RecipePage = () => {
                 <table className="w-full table-auto">
                     <thead className="bg-gray-50">
                         <tr>
+                            <th className="px-4 py-2 text-left text-xs text-gray-500 uppercase">Image</th>
                             <th className="px-4 py-2 text-left text-xs text-gray-500 uppercase">Name</th>
                             <th className="px-4 py-2 text-left text-xs text-gray-500 uppercase">User</th>
                             <th className="px-4 py-2 text-left text-xs text-gray-500 uppercase">Category</th>
@@ -36,25 +50,62 @@ const RecipePage = () => {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
-                        {recipes.map((recipe) => (
-                            <tr key={recipe.id}>
-                                <td className="px-4 py-2 font-medium text-gray-900">{recipe.name}</td>
-                                <td className="px-4 py-2 text-sm text-gray-500">{recipe.user?.name || '—'}</td>
-                                <td className="px-4 py-2 text-sm text-gray-500">{recipe.category?.name || '—'}</td>
-                                <td className="px-4 py-2 text-sm text-gray-500">{recipe.preparation_time || '—'}</td>
-                                <td className="px-4 py-2 text-sm text-gray-500">{recipe.cooking_time || '—'}</td>
-                                <td className="px-4 py-2 text-sm text-gray-500">{recipe.servings || '—'}</td>
-                                <td className="px-4 py-2 text-sm text-gray-500">{recipe.view_count}</td>
-                                <td className="px-4 py-2">
-                                    <button
-                                        onClick={() => console.log(`Viewing recipe ${recipe.id}`)}
-                                        className="text-blue-600 hover:bg-blue-100 p-1 rounded"
-                                    >
-                                        <Eye className="h-4 w-4" />
-                                    </button>
+                        {recipes.length === 0 ? (
+                            <tr>
+                                <td colSpan={9} className="text-center py-4 text-gray-500">
+                                    No recipes found.
                                 </td>
                             </tr>
-                        ))}
+                        ) : (
+                            recipes.map((recipe) => (
+                                <tr key={recipe.id}>
+                                    <td className="px-4 py-2">
+                                        {recipe.images ? (
+                                            <img
+                                                src={`http://localhost:8000/storage/recipes/${recipe.images}`} // adjust to your backend URL
+                                                alt={recipe.name}
+                                                className="w-20 h-20 object-cover rounded"
+                                            />
+                                        ) : (
+                                            <div className="w-20 h-20 bg-gray-200 flex items-center justify-center text-gray-400">
+                                                No Image
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td className="px-4 py-2 font-medium text-gray-900">{recipe.name}</td>
+                                    <td className="px-4 py-2 text-sm text-gray-500">{recipe.user?.name || '—'}</td>
+                                    <td className="px-4 py-2 text-sm text-gray-500">{recipe.category?.name || '—'}</td>
+                                    <td className="px-4 py-2 text-sm text-gray-500">{recipe.preparation_time || '—'}</td>
+                                    <td className="px-4 py-2 text-sm text-gray-500">{recipe.cooking_time || '—'}</td>
+                                    <td className="px-4 py-2 text-sm text-gray-500">{recipe.servings || '—'}</td>
+                                    <td className="px-4 py-2 text-sm text-gray-500">{recipe.view_count}</td>
+                                    <td className="px-4 py-2 flex space-x-2">
+                                        <button
+                                            onClick={() => console.log(`Viewing recipe ${recipe.id}`)}
+                                            className="text-blue-600 hover:bg-blue-100 p-1 rounded"
+                                            title="View"
+                                        >
+                                            <Eye className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => console.log(`Editing recipe ${recipe.id}`)}
+                                            className="text-green-600 hover:bg-green-100 p-1 rounded"
+                                            title="Edit"
+                                        >
+                                            <Pencil className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => console.log(`Deleting recipe ${recipe.id}`)}
+                                            className="text-red-600 hover:bg-red-100 p-1 rounded"
+                                            title="Delete"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </button>
+                                    </td>
+
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </table>
             </div>

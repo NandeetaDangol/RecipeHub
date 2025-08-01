@@ -23,6 +23,10 @@ import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 import Profile from "./pages/Profile";
 import UserProfile from "@/pages/UserProfile";
+import UsersPage from './pages/admin/UsersPage';
+import RecipePage from "./pages/admin/RecipePage";
+import CategoryPage from "./pages/admin/CategoryPage";
+
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminRoute from "./components/AdminRoute";
@@ -52,6 +56,12 @@ const App = () => (
               <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<UserProfile />} />
+              <Route path="/admin/users" element={<UsersPage />} />
+              <Route path="/admin/recipes" element={<RecipePage />} />
+              <Route path="/admin/categories" element={<CategoryPage />} />
+              {/* <Route path="/admin/categories" element={<CategoriesPage />} /> */}
+              {/* <Route path="/admin/top-rated-recipes" element={<TopRatedRecipesPage />} /> */}
+
 
               {/* <Route path="/admin/dashboard" element={<DashboardPage />} /> */}
               {/* <Route path="/admin/users" element={<UsersPage />} />

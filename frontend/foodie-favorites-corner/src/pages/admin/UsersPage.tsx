@@ -48,9 +48,9 @@ const UsersPage = ({ users }: UsersPageProps) => {
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">User Management</h2>
                 <div className="relative">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-black-700" />
                     <input
-                        type="text"
+                        type="text-black-700"
                         placeholder="Search by name or email"
                         className="pl-8 pr-4 py-2 border rounded-md text-sm"
                         value={searchTerm}
@@ -62,7 +62,7 @@ const UsersPage = ({ users }: UsersPageProps) => {
             <div className="overflow-x-auto">
                 <table className="min-w-full table-auto border-collapse">
                     <thead>
-                        <tr className="bg-gray-100 text-gray-700 text-left text-sm font-semibold">
+                        <tr className="bg-gray-100 text-black-700 text-left text-sm font-semibold">
                             <th className="px-4 py-2 border-b">Id</th>
                             <th className="px-4 py-2 border-b">Name</th>
                             <th className="px-4 py-2 border-b">Email</th>

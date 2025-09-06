@@ -8,23 +8,34 @@ import { Plus, Pencil, Trash } from "lucide-react";
 import axios from "axios";
 
 const MyRecipes = () => {
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api";
   const [searchTerm, setSearchTerm] = useState("");
-  const [recipes, setRecipes] = useState([]);
+  const [recipes, setRecipes] = useState<any[]>([]);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    console.log("API_BASE_URL:", API_BASE_URL); // Check if undefined
+    console.log("Token:", token); // Check if token exists
+
     axios
-      .get(`${API_BASE_URL}/recipes`)
+      .get(`${API_BASE_URL}/recipes`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
       .then((res) => {
-        setRecipes(res.data); // adjust if data structure is different
+        console.log("MyRecipes API Response:", res.data); // See what you're getting
+        const recipesData = Array.isArray(res.data) ? res.data : res.data.data || [];
+        console.log("Processed recipes:", recipesData);
+        setRecipes(recipesData);
       })
       .catch((err) => {
         console.error("Error loading recipes:", err);
       });
   }, []);
 
+
   const filteredRecipes = recipes.filter(
     (recipe) =>
+
       recipe.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       recipe.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -33,10 +44,9 @@ const MyRecipes = () => {
     if (!window.confirm("Are you sure you want to delete this recipe?")) return;
 
     try {
+      const token = localStorage.getItem("token"); // Get token here too
       await axios.delete(`${API_BASE_URL}/recipes/${id}`, {
-        headers: {
-          // Authorization: `Bearer ${token}`, // add token if needed
-        },
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
 
       setRecipes((prev) => prev.filter((recipe) => recipe.id !== id));

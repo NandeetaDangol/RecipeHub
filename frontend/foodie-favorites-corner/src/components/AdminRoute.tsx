@@ -4,7 +4,11 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return <p>Loading...</p>; // Or spinner
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;

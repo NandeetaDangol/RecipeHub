@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -18,9 +19,12 @@ import Profile from "./pages/Profile";
 import UsersPage from "./pages/admin/UsersPage";
 import RecipePage from "./pages/admin/RecipePage";
 import CategoryPage from "./pages/admin/CategoryPage";
+import CreateCategory from "./pages/admin/CreateCategory"; // ✅ import
+import EditCategory from "./pages/admin/EditCategory"; // ✅ import
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminRoute from "./components/AdminRoute";
 import Dashboard from "./pages/Dashboard";
+
 
 const queryClient = new QueryClient();
 
@@ -78,9 +82,33 @@ const App = () => (
                   </AdminRoute>
                 }
               />
+              <Route
+                path="/admin/categories/create" // ✅ new route
+                element={
+                  <AdminRoute>
+                    <CreateCategory />
+                  </AdminRoute>
+                }
+              />
+
+              <Route
+                path="/admin/categories/edit/:id"
+                element={
+                  <AdminRoute>
+                    <EditCategory />
+                  </AdminRoute>
+                }
+              />
+
 
               {/* Catch-all */}
               <Route path="*" element={<NotFound />} />
+
+              {/* <Route path="/admin/categories/create" element={
+                <AdminRoute>
+                  <CreateCategory />
+                </AdminRoute>
+              } /> */}
             </Routes>
           </div>
         </AuthProvider>

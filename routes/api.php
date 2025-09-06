@@ -129,7 +129,6 @@ Route::get('/recipe-histories', function () {
     ], 200);
 });
 
-Route::middleware('auth:sanctum')->get('/me/history', [RecipeController::class, 'history']);
 
 
 // Route::get('/recipe-histories', [RecipeHistoryController::class, 'index']);

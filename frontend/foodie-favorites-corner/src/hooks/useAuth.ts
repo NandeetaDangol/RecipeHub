@@ -20,7 +20,7 @@ export const useAuth = () => {
       });
   }, []);
 
-   // Logout handler
+  // Logout handler
   const logout = async () => {
     await axios.post("http://localhost:8000/api/logout", {}, { withCredentials: true });
     setUser(null);

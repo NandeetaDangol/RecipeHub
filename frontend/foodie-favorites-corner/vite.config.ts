@@ -7,7 +7,10 @@ import { componentTagger } from "lovable-tagger";
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
-    port: 8080,
+    port: 8000,
+    proxy: {
+      "/api": "http://localhost:8000", // forward API calls to Laravel backend
+    },
   },
   plugins: [
     react(),
